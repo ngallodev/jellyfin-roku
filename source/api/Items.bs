@@ -1,4 +1,5 @@
 import "pkg:/source/api/sdk.bs"
+import "pkg:/source/enums/PlaybackMethod.bs"
 
 function ItemGetPlaybackInfo(id as string, startTimeTicks = 0 as longinteger)
     params = {
@@ -13,8 +14,16 @@ function ItemGetPlaybackInfo(id as string, startTimeTicks = 0 as longinteger)
 end function
 
 function ItemPostPlaybackInfo(id as string, mediaSourceId = "" as string, audioTrackIndex = -1 as integer, subtitleTrackIndex = -1 as integer, startTimeTicks = 0 as longinteger)
+
+    transcodeCodec = string.EMPTY
+
+    if isStringEqual(m.global.queueManager.callFunc("getForceTranscode"), PlaybackMethod.FORCETRANSCODEDISABLEREMUX)
+        transcodeCodec = m.global.queueManager.callFunc("getTranscodeCodec")
+    end if
+
     body = {
-        "DeviceProfile": getDeviceProfile()
+        "DeviceProfile": getDeviceProfile(transcodeCodec),
+        "AlwaysBurnInSubtitleWhenTranscoding": true
     }
     params = {
         "UserId": m.global.session.user.id,

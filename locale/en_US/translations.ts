@@ -1828,8 +1828,8 @@
             <translation>Unhide Users</translation>
         </message>
         <message>
-            <source>Play Normally - disabled because force transcoding setting is enabled</source>
-            <translation>Play Normally - disabled because force transcoding setting is enabled</translation>
+            <source>Play Normally - disabled because of selected force transcoding setting</source>
+            <translation>Play Normally - disabled because of selected force transcoding setting</translation>
         </message>
         <message>
             <source>as</source>
@@ -2140,6 +2140,70 @@
         <message>
             <source>Note: Force transcode option automatically enabled due to video rotation</source>
             <translation>Note: Force transcode option automatically enabled due to video rotation</translation>
+        </message>
+        <message>
+            <source>Start Episode List From First Unwatched Episode</source>
+            <translation>Start Episode List From First Unwatched Episode</translation>
+        </message>
+        <message>
+            <source>When opening a season's list of episodes, automatically scroll down and start the cursor on the first unwatched episode.</source>
+            <translation>When opening a season's list of episodes, automatically scroll down and start the cursor on the first unwatched episode.</translation>
+        </message>
+        <message>
+            <source>Add To Favorites</source>
+            <translation>Add To Favorites</translation>
+        </message>
+        <message>
+            <source>Remove From Favorites</source>
+            <translation>Remove From Favorites</translation>
+        </message>
+        <message>
+            <source>Play Normally</source>
+            <translation>Play Normally</translation>
+        </message>
+        <message>
+            <source>Force Transcode (Allow Remux)</source>
+            <translation>Force Transcode (Allow Remux)</translation>
+        </message>
+        <message>
+            <source>Force Transcode (Allow Remux) - disabled because of selected force transcoding setting</source>
+            <translation>Force Transcode (Allow Remux) - disabled because of selected force transcoding setting</translation>
+        </message>
+        <message>
+            <source>Force Transcode (Remux Disabled)</source>
+            <translation>Force Transcode (Remux Disabled)</translation>
+        </message>
+        <message>
+            <source>Force Transcode (Remux Disabled) - disabled because of selected force transcoding setting</source>
+            <translation>Force Transcode (Remux Disabled) - disabled because of selected force transcoding setting</translation>
+        </message>
+        <message>
+            <source>No channels found matching your search criteria</source>
+            <translation>No channels found matching your search criteria</translation>
+        </message>
+        <message>
+            <source>Are You Still Watching Popup</source>
+            <translation>Are You Still Watching Popup</translation>
+        </message>
+        <message>
+            <source>How many minutes of inactivity before playback is stopped between items and a popup is shown to continue? Set to 0 to disable.</source>
+            <translation>How many minutes of inactivity before playback is stopped between items and a popup is shown to continue? Set to 0 to disable.</translation>
+        </message>
+        <message>
+            <source>Are You Still Watching?</source>
+            <translation>Are You Still Watching?</translation>
+        </message>
+        <message>
+            <source>Yes, continue</source>
+            <translation>Yes, continue</translation>
+        </message>
+        <message>
+            <source>No, stop playback</source>
+            <translation>No, stop playback</translation>
+        </message>
+        <message>
+            <source>Playback will automatically stop in 1 minute if no buttons are pressed.</source>
+            <translation>Playback will automatically stop in 1 minute if no buttons are pressed.</translation>
         </message>
     </context>
 </TS>

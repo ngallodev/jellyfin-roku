@@ -17,6 +17,13 @@
     "description": "Settings relating to playback and supported codec and media types.",
     "children": [
       {
+        "title": "Are You Still Watching Popup",
+        "description": "How many minutes of inactivity before playback is stopped between items and a popup is shown to continue? Set to 0 to disable.",
+        "settingName": "stillwatchingPopupInactivityTime",
+        "type": "integer",
+        "default": "0"
+      },
+      {
         "title": "Autoplay Episode Limit",
         "description": "The number of episodes that will play automatically after the selected episode. Requires 'Play next episode automatically' server setting to be enabled.",
         "settingName": "episodeQueueLimit",
@@ -81,8 +88,22 @@
         "title": "Force Transcoding",
         "description": "Force all playable media to be transcoded.",
         "settingName": "playback.media.forceTranscode",
-        "type": "bool",
-        "default": "false"
+        "type": "radio",
+        "default": "playNormally",
+        "options": [
+          {
+            "title": "Play Normally",
+            "id": "playNormally"
+          },
+          {
+            "title": "Force Transcode (Allow Remux)",
+            "id": "forceTranscodeAllowRemux"
+          },
+          {
+            "title": "Force Transcode (Remux Disabled)",
+            "id": "forceTranscodeDisableRemux"
+          }
+        ]
       },
       {
         "title": "Maximum Resolution",
@@ -1171,6 +1192,13 @@
                 "title": "Skip Details for Single Seasons",
                 "description": "If enabled, selecting a TV series with only one season will go straight to the episode list rather than the show details and season list.",
                 "settingName": "ui.tvshows.goStraightToEpisodeListing",
+                "type": "bool",
+                "default": "false"
+              },
+              {
+                "title": "Start Episode List From First Unwatched Episode",
+                "description": "When opening a season's list of episodes, automatically scroll down and start the cursor on the first unwatched episode.",
+                "settingName": "ui.tvshows.startListFromUnwatched",
                 "type": "bool",
                 "default": "false"
               }
