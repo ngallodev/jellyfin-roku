@@ -977,6 +977,26 @@
             <translation>Delete Playlist</translation>
         </message>
         <message>
+            <source>Delete</source>
+            <translation>Delete</translation>
+        </message>
+        <message>
+            <source>Are you sure you want to delete this item? This action cannot be undone.</source>
+            <translation>Are you sure you want to delete this item? This action cannot be undone.</translation>
+        </message>
+        <message>
+            <source>Yes, Delete</source>
+            <translation>Yes, Delete</translation>
+        </message>
+        <message>
+            <source>Item Deleted</source>
+            <translation>Item Deleted</translation>
+        </message>
+        <message>
+            <source>Failed to Delete Item</source>
+            <translation>Failed to Delete Item</translation>
+        </message>
+        <message>
             <source>MPEG-4 Support</source>
             <translation>MPEG-4 Support</translation>
             <extracomment>Settings Menu - Title for option</extracomment>
