@@ -1154,6 +1154,12 @@ sub onButtonSelectedEvent(msg)
         return
     end if
 
+    ' Handle delete button clicks
+    if isStringEqual(btn, "delete-button")
+        MainAction.onDeleteButtonClicked(activeScene)
+        return
+    end if
+
     if isStringEqual(btn, "editsubtitlesbutton")
         MainAction.onEditSubtitlesButtonClicked(activeScene)
         return

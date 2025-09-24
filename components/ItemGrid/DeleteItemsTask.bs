@@ -1,0 +1,14 @@
+import "pkg:/source/api/baserequest.bs"
+import "pkg:/source/api/sdk.bs"
+import "pkg:/source/utils/config.bs"
+
+sub init()
+    m.top.functionName = "deleteItem"
+end sub
+
+sub deleteItem()
+    if not isValid(m.top.itemId) then return
+
+    ' Call the API to delete the item from library and filesystem
+    api.items.DeleteByID(m.top.itemId)
+end sub

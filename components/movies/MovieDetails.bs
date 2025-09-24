@@ -367,6 +367,7 @@ sub itemContentChanged()
     end if
     setWatchedColor()
     setFavoriteColor()
+    setDeleteButtonVisibility()
 
     ' We don't need to update everything if this is a reload
     ' Unless this is an episode
@@ -755,6 +756,18 @@ sub setFavoriteColor()
         fave_button.iconBlendColor = ColorPalette.WHITE
         fave_button.text = tr("Mark As Favorite")
         fave_button.AUDIO_GUIDE_SUFFIX = tr("Mark As Favorite")
+    end if
+end sub
+
+sub setDeleteButtonVisibility()
+    deleteButton = m.top.findNode("delete-button")
+    if not isValid(deleteButton) then return
+    
+    ' Only show delete button if user has permission
+    if get_user_setting("content.candelete") = "true"
+        deleteButton.visible = true
+    else
+        deleteButton.visible = false
     end if
 end sub
 

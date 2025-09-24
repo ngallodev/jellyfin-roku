@@ -142,6 +142,31 @@ namespace MainAction
         movie.favorite = not movie.favorite
     end sub
 
+    sub onDeleteButtonClicked(activeScene as object)
+        movie = chainLookup(activeScene, "itemContent")
+        if not isValid(movie) or not isValid(movie.id) then return
+        
+        ' Check user permissions
+        if get_user_setting("content.candelete") <> "true" then return
+        
+        ' Show confirmation dialog
+        confirmationResult = show_dialog(
+            tr("Are you sure you want to delete this item? This action cannot be undone."), 
+            [tr("Yes, Delete"), tr("Cancel")], 
+            1
+        )
+        
+        ' User confirmed deletion
+        if confirmationResult = 0
+            deleteTask = createObject("roSGNode", "DeleteItemsTask")
+            deleteTask.itemId = movie.id
+            deleteTask.control = TaskControl.RUN
+            
+            ' Navigate back after deletion since the item will no longer exist
+            m.global.sceneManager.callFunc("popScene")
+        end if
+    end sub
+
     sub onEditSubtitlesButtonClicked(activeScene as object)
         subtitleSearchView = createObject("roSGNode", "SubtitleSearchView")
         subtitleSearchView.observeField("subtitleLanguageButtonSelected", m.port)
