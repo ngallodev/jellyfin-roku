@@ -836,12 +836,11 @@ end sub
 sub setDeleteButtonVisibility()
     deleteButton = m.top.findNode("delete-button")
     if not isValid(deleteButton) then return
-    
+
     ' Only show delete button if user has permission
-    if get_user_setting("content.candelete") = "true"
-        deleteButton.visible = true
-    else
-        deleteButton.visible = false
+    if get_user_setting("content.candelete") <> "true"
+        m.buttonGrp.content.removeChild(deleteButton)
+        calculateButtonThumbProperties()
     end if
 end sub
 
