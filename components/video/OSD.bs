@@ -79,7 +79,7 @@ sub init()
     m.optionControlsMoved = false
 
     m.videoControls.buttonFocused = m.top.defaultButtonIndex
-    m.optionControls.buttonFocused = m.optionControls.getChildCount() - 1
+    m.optionControls.buttonFocused = getRightmostFocusableOptionIndex()
 
     m.videoControls.getChild(m.top.defaultButtonIndex).focus = true
     m.deviceInfo = CreateObject("roDeviceInfo")
@@ -301,6 +301,13 @@ function isButtonFocusable(button as dynamic) as boolean
     return true
 end function
 
+function getRightmostFocusableOptionIndex() as integer
+    for i = m.optionControls.getChildCount() - 1 to 0 step -1
+        if isButtonFocusable(m.optionControls.getChild(i)) then return i
+    end for
+    return 0
+end function
+
 ' onTransportButtonStatusChanged: Updates enabled states of bottom transport buttons
 '
 sub onTransportButtonStatusChanged()
@@ -396,7 +403,7 @@ sub resetFocusToDefaultButton()
         buttonToFocus.focus = true
     end if
     m.videoControls.buttonFocused = targetIndex
-    m.optionControls.buttonFocused = m.optionControls.getChildCount() - 1
+    m.optionControls.buttonFocused = getRightmostFocusableOptionIndex()
 end sub
 
 ' onVisibleChanged: Handler for changes to the visibility of this menu.
@@ -460,11 +467,7 @@ sub onButtonSelected()
     end if
 
     selectedButton = buttonGroup.getChild(m.focusedButtonIndex)
-
-    ' If selected button is disabled, do nothing
-    if isValid(selectedButton) and isValid(selectedButton.enabled) and not selectedButton.enabled
-        return
-    end if
+    if not isButtonFocusable(selectedButton) then return
 
     if LCase(selectedButton.id) = "chapterlist"
         m.top.showChapterList = not m.top.showChapterList
@@ -664,6 +667,10 @@ sub setOsdStatus(whichfocus as string)
     if whichfocus = "optionControls"
         m.scrubber.visible = false
         m.progressBarGroup.setFocus(false)
+        optionButton = m.optionControls.getChild(m.optionControls.buttonFocused)
+        if not isButtonFocusable(optionButton)
+            m.optionControls.buttonFocused = getRightmostFocusableOptionIndex()
+        end if
         m.focusedButtonIndex = m.optionControls.buttonFocused
         focusedButton = m.optionControls.getChild(m.focusedButtonIndex)
         focusedButton.focus = true
@@ -683,8 +690,12 @@ sub setOsdStatus(whichfocus as string)
         m.scrubberOldPosition.visible = true
         checkDisplaySiblingItem("")
         resetFocusToDefaultButton()
-        m.videoControls.getChild(m.focusedButtonIndex).focus = false
-        m.optionControls.getChild(m.focusedButtonIndex).focus = false
+        for each button in m.videoControls.getChildren(-1, 0)
+            if isValid(button.focus) then button.focus = false
+        end for
+        for each button in m.optionControls.getChildren(-1, 0)
+            if isValid(button.focus) then button.focus = false
+        end for
         m.videoControls.setFocus(false)
         m.optionControls.setFocus(false)
         m.progressBarGroup.setFocus(true)

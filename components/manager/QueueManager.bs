@@ -29,6 +29,24 @@ sub init()
     m.episodeToShowAtFinish = string.EMPTY
     m.preferredSubtitleTrack = {}
     m.shuffleEnabled = false
+    m.deferredDeleteItemId = string.EMPTY
+    m.deferredDeleteTask = invalid
+end sub
+
+' Keep the current media file until another item has actually started playback.
+sub deferDeleteUntilNextItem(itemId as string)
+    m.deferredDeleteItemId = itemId
+end sub
+
+sub runDeferredDelete(currentItemId as string)
+    if not isValidAndNotEmpty(m.deferredDeleteItemId) then return
+    if isStringEqual(m.deferredDeleteItemId, currentItemId) then return
+
+    deleteItemId = m.deferredDeleteItemId
+    m.deferredDeleteItemId = string.EMPTY
+    m.deferredDeleteTask = createObject("roSGNode", "DeleteItemsTask")
+    m.deferredDeleteTask.itemId = deleteItemId
+    m.deferredDeleteTask.control = "run"
 end sub
 
 ' Clear all content from play queue

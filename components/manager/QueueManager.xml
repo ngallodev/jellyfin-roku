@@ -49,6 +49,8 @@
     <function name="setPreferredAudioTrackName" />
     <function name="setSelectedAudioStreamIndex" />
     <function name="setTopStartingPoint" />
+    <function name="deferDeleteUntilNextItem" />
+    <function name="runDeferredDelete" />
     <function name="setPosition" />
     <function name="setPrerollStatus" />
     <function name="toggleShuffle" />

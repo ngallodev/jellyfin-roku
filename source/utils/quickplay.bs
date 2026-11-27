@@ -38,6 +38,42 @@ namespace quickplay
         itemNode.startingPoint = playbackPosition
 
         m.global.queueManager.callFunc("push", itemNode)
+        quickplay.enqueueRelatedVideos(itemNode)
+    end sub
+
+    sub enqueueRelatedVideos(item as dynamic)
+        itemJson = item.json ?? item
+        itemId = chainLookupReturn(item, "id", string.EMPTY)
+        if not isValidAndNotEmpty(itemId) then return
+
+        if chainLookupReturn(itemJson, "UserData.IsFavorite", false)
+            result = api.items.Get({
+                "UserId": m.global.session.user.id,
+                "IncludeItemTypes": "Movie,Video,Episode,MusicVideo",
+                "Filters": "IsFavorite",
+                "SortBy": "Random",
+                "Recursive": true,
+                "Limit": 50,
+                "EnableTotalRecordCount": false,
+                "EnableImages": false
+            })
+        else
+            result = api.items.GetSimilar(itemId, {
+                "UserId": m.global.session.user.id,
+                "Limit": 50,
+                "EnableImages": false
+            })
+        end if
+
+        relatedItems = chainLookupReturn(result, "Items", [])
+        queued = 0
+        for each relatedItem in relatedItems
+            if isValid(relatedItem.Id) and relatedItem.Id <> itemId
+                m.global.queueManager.callFunc("push", relatedItem)
+                queued++
+                if queued >= 50 then exit for
+            end if
+        end for
     end sub
 
     ' A single audiobook file.

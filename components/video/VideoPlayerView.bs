@@ -98,6 +98,15 @@ sub init()
     m.favoriteChannelButton = invalid
     m.favoriteChannelId = string.EMPTY
     m.channelIsFavorite = false
+    m.favoriteTitleButton = m.osd.findNode("favoriteTitle")
+    m.deleteTitleButton = m.osd.findNode("deleteTitle")
+    m.titleIsFavorite = false
+    m.favoriteTitleTask = invalid
+    m.deleteConfirmationDialog = invalid
+    m.deleteConfirmationItemId = string.EMPTY
+    m.deleteConfirmationAccepted = false
+    m.deleteTitleButton.visible = get_user_setting("content.candelete") = "true"
+    m.deleteTitleButton.text = tr("Delete")
     m.progressBarBackground = m.osd.findNode("progressBarBackground")
     m.progressBarGroup = m.osd.findNode("progressBarGroup")
 
@@ -519,6 +528,16 @@ end sub
 sub onOSDAction()
     action = LCase(m.osd.action)
 
+    if action = "favoritetitle"
+        toggleFavoriteTitle()
+        return
+    end if
+
+    if action = "deletetitle"
+        deleteCurrentTitle()
+        return
+    end if
+
     if action = "favoritechannel"
         toggleFavoriteChannel()
         return
@@ -608,6 +627,82 @@ sub onOSDAction()
         setSkipSegmentButtonFocus()
         return
     end if
+end sub
+
+sub toggleFavoriteTitle()
+    currentItem = m.global.queueManager.callFunc("getCurrentItem")
+    itemId = chainLookupReturn(currentItem, "id", string.EMPTY)
+    if not isValidAndNotEmpty(itemId) then return
+    if isValid(m.favoriteTitleTask) and m.favoriteTitleTask.state = TaskControl.RUN then return
+
+    m.titleIsFavorite = not m.titleIsFavorite
+    m.favoriteTitleButton.icon = m.titleIsFavorite ? "pkg:/images/icons/favorite_selected.png" : "pkg:/images/icons/favorite_outline_white.png"
+    if isChainValid(currentItem, "json.UserData")
+        itemJson = currentItem.json
+        itemJson.UserData.AddReplace("IsFavorite", m.titleIsFavorite)
+        currentItem.json = itemJson
+    end if
+    if isChainValid(currentItem, "UserData")
+        currentItem.UserData.AddReplace("IsFavorite", m.titleIsFavorite)
+    end if
+    if isChainValid(currentItem, "favorite") then currentItem.favorite = m.titleIsFavorite
+
+    m.favoriteTitleTask = createObject("roSGNode", "FavoriteItemsTask")
+    m.favoriteTitleTask.itemId = itemId
+    m.favoriteTitleTask.favTask = m.titleIsFavorite ? "Favorite" : "Unfavorite"
+    m.favoriteTitleTask.control = TaskControl.RUN
+end sub
+
+sub deleteCurrentTitle()
+    if get_user_setting("content.candelete") <> "true" then return
+    if isValid(m.deleteConfirmationDialog) then return
+    currentItem = m.global.queueManager.callFunc("getCurrentItem")
+    itemId = chainLookupReturn(currentItem, "id", string.EMPTY)
+    if not isValidAndNotEmpty(itemId) then return
+
+    m.deleteConfirmationItemId = itemId
+    m.deleteConfirmationAccepted = false
+    dialog = createObject("roSGNode", "Dialog")
+    dialog.title = tr("Delete")
+    dialog.message = tr("Are you sure you want to delete this item? This action cannot be undone.")
+    dialog.buttons = [tr("Cancel"), tr("Yes, Delete")]
+    dialog.observeField("buttonSelected", "onDeleteConfirmationButtonSelected")
+    dialog.observeField("wasClosed", "onDeleteConfirmationDialogClosed")
+    m.deleteConfirmationDialog = dialog
+    m.top.getScene().dialog = dialog
+end sub
+
+sub onDeleteConfirmationButtonSelected(event)
+    dialog = event.getRoSGNode()
+    m.deleteConfirmationAccepted = dialog.buttonSelected = 1
+    dialog.close = true
+end sub
+
+sub onDeleteConfirmationDialogClosed(event)
+    dialog = event.getRoSGNode()
+    dialog.unobserveField("buttonSelected")
+    dialog.unobserveField("wasClosed")
+    if m.top.getScene().dialog = dialog then m.top.getScene().dialog = invalid
+    m.deleteConfirmationDialog = invalid
+
+    itemId = m.deleteConfirmationItemId
+    m.deleteConfirmationItemId = string.EMPTY
+    if not m.deleteConfirmationAccepted then return
+    m.deleteConfirmationAccepted = false
+    if get_user_setting("content.candelete") <> "true" then return
+    currentItem = m.global.queueManager.callFunc("getCurrentItem")
+    if chainLookupReturn(currentItem, "id", string.EMPTY) <> itemId then return
+
+    m.global.queueManager.callFunc("deferDeleteUntilNextItem", itemId)
+end sub
+
+sub configureTitleControls(currentItem as object)
+    itemType = LCase(chainLookupReturn(currentItem, "type", string.EMPTY))
+    isVideo = inArray(["movie", "video", "episode", "musicvideo"], itemType)
+    m.favoriteTitleButton.visible = isVideo
+    m.deleteTitleButton.visible = isVideo and get_user_setting("content.candelete") = "true"
+    m.titleIsFavorite = chainLookupReturn(currentItem, "json.UserData.IsFavorite", chainLookupReturn(currentItem, "UserData.IsFavorite", false))
+    m.favoriteTitleButton.icon = m.titleIsFavorite ? "pkg:/images/icons/favorite_selected.png" : "pkg:/images/icons/favorite_outline_white.png"
 end sub
 
 ' Show a channel favorite action in the OSD only for Live TV channels.
@@ -861,6 +956,7 @@ sub onVideoContentLoaded()
 
     m.top.content = videoContent[0].content
     configureFavoriteChannelButton(videoContent[0])
+    configureTitleControls(m.global.queueManager.callFunc("getCurrentItem"))
     ' Build enriched Now Playing metadata for Roku Voice "what's playing" command
     itemData = m.global.queueManager.callFunc("getCurrentItem")
     if isValid(itemData)
@@ -1578,6 +1674,7 @@ sub onState(msg)
             end if
         end if
     else if isStringEqual(m.top.state, MediaPlaybackState.PLAYING)
+        m.global.queueManager.callFunc("runDeferredDelete", m.top.id)
 
         ' Reset retry counter when playback is successful
         if m.playbackRetries > 0

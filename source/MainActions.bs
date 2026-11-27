@@ -4,6 +4,7 @@ import "pkg:/source/enums/ItemType.bs"
 import "pkg:/source/enums/ResumePopupAction.bs"
 import "pkg:/source/enums/String.bs"
 import "pkg:/source/utils/misc.bs"
+import "pkg:/source/utils/quickplay.bs"
 
 namespace MainAction
     sub onPlayButtonClicked(activeScene as object)
@@ -246,6 +247,14 @@ namespace MainAction
 
         m.global.queueManager.callFunc("clear")
         m.global.queueManager.callFunc(playItemParams.method, item)
+
+        ' A single video starts an automatic related queue. Explicit queues use set() and remain untouched.
+        if playItemParams.method = "push" and type(item) <> "roArray"
+            itemType = LCase(chainLookupReturn(item, "type", chainLookupReturn(item, "json.Type", string.EMPTY)))
+            if inArray(["movie", "video", "episode", "musicvideo"], itemType)
+                quickplay.enqueueRelatedVideos(item)
+            end if
+        end if
 
         if playItemParams.setShuffle
             m.global.queueManager.callFunc("setShuffle", true)
